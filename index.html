@@ -128,7 +128,6 @@
             bottom: 0;
         }
 
-        /* Markdown preview styles with improved contrast */
         .preview h1, .preview h2, .preview h3, .preview h4, .preview h5, .preview h6 {
             margin: 0 0 0.5em 0;
             color: #f0f6fc;
@@ -358,7 +357,6 @@ Happy writing! 🚀</textarea>
                     this.updateLineNumbers();
                 });
                 
-                // Ultra-fast, precise scroll sync with 0ms latency
                 this.editor.addEventListener('scroll', () => {
                     if (this.isScrollSyncing) return;
                     this.syncScrollPrecise('editor');
@@ -370,7 +368,6 @@ Happy writing! 🚀</textarea>
                     this.syncScrollPrecise('preview');
                 }, { passive: true });
                 
-                // Handle tab key for indentation
                 this.editor.addEventListener('keydown', (e) => {
                     if (e.key === 'Tab') {
                         e.preventDefault();
@@ -423,12 +420,10 @@ Happy writing! 🚀</textarea>
                     const html = marked.parse(markdown);
                     this.preview.innerHTML = html;
                     
-                    // Enhanced syntax highlighting with comprehensive error handling
                     if (window.Prism && 
                         window.Prism.highlightElement && 
                         window.Prism.languages) {
                         
-                        // Use requestAnimationFrame to ensure DOM is ready
                         requestAnimationFrame(() => {
                             this.preview.querySelectorAll('pre code').forEach((block) => {
                                 try {
@@ -446,7 +441,6 @@ Happy writing! 🚀</textarea>
                                         language = langClass.replace('language-', '');
                                     }
                                     
-                                    // Validate that the language exists and is properly loaded
                                     const languageExists = language !== 'none' && 
                                                          window.Prism.languages &&
                                                          window.Prism.languages[language] &&
@@ -454,21 +448,17 @@ Happy writing! 🚀</textarea>
                                                          Object.keys(window.Prism.languages[language]).length > 0;
                                     
                                     if (languageExists) {
-                                        // Clear existing classes to prevent conflicts
                                         block.className = '';
                                         block.classList.add(`language-${language}`);
                                         
-                                        // Apply syntax highlighting
                                         Prism.highlightElement(block);
                                     } else {
-                                        // Use fallback styling for unsupported languages
                                         block.className = 'language-none';
                                         if (language !== 'none') {
                                             console.warn(`Language '${language}' not supported or not loaded`);
                                         }
                                     }
                                 } catch (syntaxError) {
-                                    // Graceful fallback for individual code blocks
                                     console.warn('Syntax highlighting failed for code block:', syntaxError);
                                     block.className = 'language-none';
                                 }
@@ -477,7 +467,6 @@ Happy writing! 🚀</textarea>
                     }
                 } catch (e) {
                     console.error('Preview update failed:', e);
-                    // Provide user-friendly error message
                     this.preview.innerHTML = `
                         <div style="color: #f85149; background: #21262d; padding: 1em; border-radius: 5px; border: 1px solid #30363d;">
                             <strong>Preview Error:</strong> ${e.message}
@@ -498,11 +487,9 @@ Happy writing! 🚀</textarea>
                 
                 this.lineNumbers.textContent = lineNumbersHtml;
                 
-                // Adjust line numbers width based on content
                 const minWidth = Math.max(32, maxDigits * 8 + 16);
                 this.lineNumbers.style.minWidth = minWidth + 'px';
                 
-                // Sync line numbers scroll with editor
                 this.lineNumbers.scrollTop = this.editor.scrollTop;
             }
             
@@ -549,14 +536,11 @@ Happy writing! 🚀</textarea>
                     }
                 }
                 
-                // Immediate unlock for maximum responsiveness
                 this.isScrollSyncing = false;
             }
         }
         
-        // Wait for all scripts to load before initializing
         function initializeWhenReady() {
-            // Check if all required libraries are loaded
             const prismReady = window.Prism && 
                               window.Prism.highlightElement && 
                               window.Prism.languages &&
@@ -569,18 +553,15 @@ Happy writing! 🚀</textarea>
                     new MarkdownEditor();
                 } catch (e) {
                     console.error('Failed to initialize Markdown Editor:', e);
-                    // Initialize without syntax highlighting as fallback
                     new MarkdownEditor();
                 }
             } else {
-                // Wait a bit more for scripts to load, but don't wait forever
                 if (!window.initAttempts) window.initAttempts = 0;
                 window.initAttempts++;
                 
-                if (window.initAttempts < 50) { // Max 5 seconds
+                if (window.initAttempts < 50) {
                     setTimeout(initializeWhenReady, 100);
                 } else {
-                    // Initialize anyway, even if Prism isn't fully ready
                     console.warn('Prism.js not fully loaded, initializing without syntax highlighting');
                     try {
                         new MarkdownEditor();
@@ -591,22 +572,20 @@ Happy writing! 🚀</textarea>
             }
         }
         
-        // Initialize when DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initializeWhenReady);
         } else {
             initializeWhenReady();
         }
         
-        // Handle any unhandled errors gracefully
         window.addEventListener('error', (e) => {
             console.error('Unhandled error:', e.error);
-            return true; // Prevent default error handling
+            return true;
         });
         
         window.addEventListener('unhandledrejection', (e) => {
             console.error('Unhandled promise rejection:', e.reason);
-            e.preventDefault(); // Prevent default error handling
+            e.preventDefault();
         });
     </script>
 </body>
