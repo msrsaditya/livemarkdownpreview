@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Live Preview</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-dark.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+        }
+
+        .editor-panel {
+            background: #1e1e1e;
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+            width: 50%;
+        }
+
+        .preview-panel {
+            background: #1a1a1a;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+        }
+
+        .line-numbers {
+            background: #252525;
+            color: #666;
+            padding: 12px 4px 12px 8px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            text-align: right;
+            user-select: none;
+            width: auto;
+            min-width: 32px;
+            border-right: 1px solid #333;
+            overflow: hidden;
+            white-space: pre;
+            height: 100%;
+        }
+
+        .editor-wrapper {
+            display: flex;
+            flex: 1;
+            position: relative;
+            height: 100%;
+        }
+
+        .editor {
+            flex: 1;
+            background: #1e1e1e;
+            color: #e0e0e0;
+            border: none;
+            outline: none;
+            padding: 12px 16px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Markdown syntax highlighting in editor */
+        .editor {
+            background: linear-gradient(to right, 
+                #1e1e1e 0%, 
+                #1e1e1e 100%
+            );
+        }
+
+        .preview {
+            flex: 1;
+            padding: 12px 20px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .resizer {
+            width: 4px;
+            background: #333;
+            cursor: col-resize;
+            position: relative;
+            transition: background-color 0.2s;
+        }
+
+        .resizer:hover {
+            background: #555;
+        }
+
+        .resizer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -2px;
+            right: -2px;
+            bottom: 0;
+        }
+
+        /* Markdown preview styles */
+        .preview h1, .preview h2, .preview h3, .preview h4, .preview h5, .preview h6 {
+            margin: 0 0 0.5em 0;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .preview h1:not(:first-child), .preview h2:not(:first-child), .preview h3:not(:first-child), 
+        .preview h4:not(:first-child), .preview h5:not(:first-child), .preview h6:not(:first-child) {
+            margin-top: 1.5em;
+        }
+
+        .preview h1 {
+            font-size: 2em;
+            border-bottom: 1px solid #333;
+            padding-bottom: 0.3em;
+        }
+
+        .preview h2 {
+            font-size: 1.5em;
+            border-bottom: 1px solid #333;
+            padding-bottom: 0.3em;
+        }
+
+        .preview h3 {
+            font-size: 1.25em;
+        }
+
+        .preview p {
+            margin: 1em 0;
+        }
+
+        .preview ul, .preview ol {
+            margin: 1em 0;
+            padding-left: 2em;
+        }
+
+        .preview li {
+            margin: 0.25em 0;
+        }
+
+        .preview code {
+            background: #2d2d2d;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        .preview pre {
+            background: #2d2d2d;
+            padding: 1em;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+
+        .preview pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .preview blockquote {
+            border-left: 4px solid #444;
+            margin: 1em 0;
+            padding-left: 1em;
+            color: #ccc;
+        }
+
+        .preview table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1em 0;
+        }
+
+        .preview th, .preview td {
+            border: 1px solid #444;
+            padding: 0.5em;
+            text-align: left;
+        }
+
+        .preview th {
+            background: #2d2d2d;
+            font-weight: 600;
+        }
+
+        .preview a {
+            color: #4a9eff;
+            text-decoration: none;
+        }
+
+        .preview a:hover {
+            text-decoration: underline;
+        }
+
+        .preview img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .preview hr {
+            border: none;
+            border-top: 1px solid #444;
+            margin: 2em 0;
+        }
+
+        /* Scrollbar styles */
+        .editor::-webkit-scrollbar, .preview::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .editor::-webkit-scrollbar-track, .preview::-webkit-scrollbar-track {
+            background: #2d2d2d;
+        }
+
+        .editor::-webkit-scrollbar-thumb, .preview::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 4px;
+        }
+
+        .editor::-webkit-scrollbar-thumb:hover, .preview::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="editor-panel" id="editorPanel">
+            <div class="editor-wrapper">
+                <div class="line-numbers" id="lineNumbers">1</div>
+                <textarea class="editor" id="editor" placeholder="Type your markdown here..."># Welcome to Markdown Live Preview
+
+This is a **live preview** markdown editor. Start typing to see your content rendered in real-time!
+
+## Features
+
+- ✨ Live preview
+- 🎨 Syntax highlighting
+- 📏 Line numbers
+- 🌙 Dark theme
+- ↔️ Resizable panels
+- 🔄 Scroll synchronization
+
+## Code Example
+
+```javascript
+function greet(name) {
+    return `Hello, ${name}!`;
+}
+
+console.log(greet('World'));
+```
+
+## Lists
+
+### Unordered List
+- Item 1
+- Item 2
+  - Nested item
+  - Another nested item
+- Item 3
+
+### Ordered List
+1. First item
+2. Second item
+3. Third item
+
+## Blockquote
+
+> This is a blockquote. It can span multiple lines and is great for highlighting important information or quotes.
+
+## Table
+
+| Column 1 | Column 2 | Column 3 |
+|----------|----------|----------|
+| Row 1    | Data     | More data|
+| Row 2    | Info     | Details  |
+
+---
+
+Happy writing! 🚀</textarea>
+            </div>
+        </div>
+        
+        <div class="resizer" id="resizer"></div>
+        
+        <div class="preview-panel">
+            <div class="preview" id="preview"></div>
+        </div>
+    </div>
+
+    <script>
+        class MarkdownEditor {
+            constructor() {
+                this.editor = document.getElementById('editor');
+                this.preview = document.getElementById('preview');
+                this.lineNumbers = document.getElementById('lineNumbers');
+                this.resizer = document.getElementById('resizer');
+                this.editorPanel = document.getElementById('editorPanel');
+                
+                this.isResizing = false;
+                this.isScrollSyncing = false;
+                this.lastEditorScroll = 0;
+                this.lastPreviewScroll = 0;
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupEditor();
+                this.setupResizer();
+                this.updatePreview();
+                this.updateLineNumbers();
+            }
+            
+            setupEditor() {
+                this.editor.addEventListener('input', () => {
+                    this.updatePreview();
+                    this.updateLineNumbers();
+                });
+                
+                // Ultra-fast, precise scroll sync with 0ms latency
+                this.editor.addEventListener('scroll', () => {
+                    if (this.isScrollSyncing) return;
+                    this.syncScrollPrecise('editor');
+                    this.lineNumbers.scrollTop = this.editor.scrollTop;
+                }, { passive: true });
+                
+                this.preview.addEventListener('scroll', () => {
+                    if (this.isScrollSyncing) return;
+                    this.syncScrollPrecise('preview');
+                }, { passive: true });
+                
+                // Handle tab key for indentation
+                this.editor.addEventListener('keydown', (e) => {
+                    if (e.key === 'Tab') {
+                        e.preventDefault();
+                        const start = this.editor.selectionStart;
+                        const end = this.editor.selectionEnd;
+                        
+                        this.editor.value = this.editor.value.substring(0, start) + 
+                                          '    ' + 
+                                          this.editor.value.substring(end);
+                        
+                        this.editor.selectionStart = this.editor.selectionEnd = start + 4;
+                        this.updatePreview();
+                        this.updateLineNumbers();
+                    }
+                });
+            }
+            
+            setupResizer() {
+                this.resizer.addEventListener('mousedown', (e) => {
+                    this.isResizing = true;
+                    document.addEventListener('mousemove', this.handleResize.bind(this));
+                    document.addEventListener('mouseup', this.stopResize.bind(this));
+                    document.body.style.cursor = 'col-resize';
+                    document.body.style.userSelect = 'none';
+                });
+            }
+            
+            handleResize(e) {
+                if (!this.isResizing) return;
+                
+                const containerRect = document.querySelector('.container').getBoundingClientRect();
+                const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+                
+                if (newWidth > 20 && newWidth < 80) {
+                    this.editorPanel.style.width = newWidth + '%';
+                }
+            }
+            
+            stopResize() {
+                this.isResizing = false;
+                document.removeEventListener('mousemove', this.handleResize.bind(this));
+                document.removeEventListener('mouseup', this.stopResize.bind(this));
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
+            
+            updatePreview() {
+                try {
+                    const markdown = this.editor.value;
+                    const html = marked.parse(markdown);
+                    this.preview.innerHTML = html;
+                    
+                    // Enhanced syntax highlighting with error handling
+                    if (window.Prism && window.Prism.highlightElement) {
+                        // Highlight all code blocks
+                        this.preview.querySelectorAll('pre code').forEach((block) => {
+                            try {
+                                // Detect language from class or default to javascript
+                                let language = 'javascript';
+                                const classList = Array.from(block.classList);
+                                const langClass = classList.find(cls => cls.startsWith('language-'));
+                                
+                                if (langClass) {
+                                    language = langClass.replace('language-', '');
+                                } else {
+                                    // Try to detect from parent pre element
+                                    const parentClasses = Array.from(block.parentElement.classList);
+                                    const parentLangClass = parentClasses.find(cls => cls.startsWith('language-'));
+                                    if (parentLangClass) {
+                                        language = parentLangClass.replace('language-', '');
+                                        block.className = `language-${language}`;
+                                    } else {
+                                        block.className = `language-${language}`;
+                                    }
+                                }
+                                
+                                // Ensure the language is supported
+                                if (window.Prism.languages[language]) {
+                                    Prism.highlightElement(block);
+                                } else {
+                                    // Fallback to plain text
+                                    block.className = 'language-none';
+                                }
+                            } catch (e) {
+                                // Silent fallback - don't break the preview
+                                console.warn('Syntax highlighting failed for code block:', e);
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Preview update failed:', e);
+                    // Don't break the editor if preview fails
+                }
+            }
+            
+            updateLineNumbers() {
+                const lines = this.editor.value.split('\n').length;
+                const maxDigits = lines.toString().length;
+                let lineNumbersHtml = '';
+                
+                for (let i = 1; i <= lines; i++) {
+                    lineNumbersHtml += i.toString().padStart(maxDigits, ' ') + (i < lines ? '\n' : '');
+                }
+                
+                this.lineNumbers.textContent = lineNumbersHtml;
+                
+                // Adjust line numbers width based on content
+                const minWidth = Math.max(32, maxDigits * 8 + 16);
+                this.lineNumbers.style.minWidth = minWidth + 'px';
+                
+                // Sync line numbers scroll with editor
+                this.lineNumbers.scrollTop = this.editor.scrollTop;
+            }
+            
+            syncScrollPrecise(source) {
+                this.isScrollSyncing = true;
+                
+                if (source === 'editor') {
+                    const currentScroll = this.editor.scrollTop;
+                    if (currentScroll === this.lastEditorScroll) {
+                        this.isScrollSyncing = false;
+                        return;
+                    }
+                    this.lastEditorScroll = currentScroll;
+                    
+                    const maxEditorScroll = Math.max(0, this.editor.scrollHeight - this.editor.clientHeight);
+                    const maxPreviewScroll = Math.max(0, this.preview.scrollHeight - this.preview.clientHeight);
+                    
+                    if (maxEditorScroll === 0) {
+                        this.preview.scrollTop = 0;
+                    } else {
+                        const scrollRatio = currentScroll / maxEditorScroll;
+                        const targetScroll = scrollRatio * maxPreviewScroll;
+                        this.preview.scrollTop = targetScroll;
+                    }
+                } else {
+                    const currentScroll = this.preview.scrollTop;
+                    if (currentScroll === this.lastPreviewScroll) {
+                        this.isScrollSyncing = false;
+                        return;
+                    }
+                    this.lastPreviewScroll = currentScroll;
+                    
+                    const maxPreviewScroll = Math.max(0, this.preview.scrollHeight - this.preview.clientHeight);
+                    const maxEditorScroll = Math.max(0, this.editor.scrollHeight - this.editor.clientHeight);
+                    
+                    if (maxPreviewScroll === 0) {
+                        this.editor.scrollTop = 0;
+                        this.lineNumbers.scrollTop = 0;
+                    } else {
+                        const scrollRatio = currentScroll / maxPreviewScroll;
+                        const targetScroll = scrollRatio * maxEditorScroll;
+                        this.editor.scrollTop = targetScroll;
+                        this.lineNumbers.scrollTop = targetScroll;
+                    }
+                }
+                
+                // Immediate unlock for maximum responsiveness
+                this.isScrollSyncing = false;
+            }
+        }
+        
+        // Initialize the editor when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                new MarkdownEditor();
+            } catch (e) {
+                console.error('Failed to initialize Markdown Editor:', e);
+            }
+        });
+        
+        // Handle any unhandled errors
+        window.addEventListener('error', (e) => {
+            console.error('Unhandled error:', e.error);
+            return true; // Prevent default error handling
+        });
+        
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('Unhandled promise rejection:', e.reason);
+            e.preventDefault(); // Prevent default error handling
+        });
+    </script>
+</body>
+</html>
