@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A live markdown editor with real-time preview, syntax highlighting, line numbers, and resizable panels. Perfect for writing and previewing markdown content instantly.">
     <title>Markdown Live Preview</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
@@ -23,8 +24,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: #1a1a1a;
-            color: #e0e0e0;
+            background: #0d1117;
+            color: #f0f6fc;
             height: 100vh;
             overflow: hidden;
         }
@@ -36,8 +37,8 @@
         }
 
         .editor-panel {
-            background: #1e1e1e;
-            border-right: 1px solid #333;
+            background: #161b22;
+            border-right: 1px solid #30363d;
             display: flex;
             flex-direction: column;
             min-width: 200px;
@@ -45,7 +46,7 @@
         }
 
         .preview-panel {
-            background: #1a1a1a;
+            background: #0d1117;
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -53,8 +54,8 @@
         }
 
         .line-numbers {
-            background: #252525;
-            color: #666;
+            background: #21262d;
+            color: #8b949e;
             padding: 12px 4px 12px 8px;
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
             font-size: 14px;
@@ -63,7 +64,7 @@
             user-select: none;
             width: auto;
             min-width: 32px;
-            border-right: 1px solid #333;
+            border-right: 1px solid #30363d;
             overflow: hidden;
             white-space: pre;
             height: 100%;
@@ -78,8 +79,8 @@
 
         .editor {
             flex: 1;
-            background: #1e1e1e;
-            color: #e0e0e0;
+            background: #161b22;
+            color: #f0f6fc;
             border: none;
             outline: none;
             padding: 12px 16px;
@@ -94,12 +95,8 @@
             height: 100%;
         }
 
-        /* Markdown syntax highlighting in editor */
-        .editor {
-            background: linear-gradient(to right, 
-                #1e1e1e 0%, 
-                #1e1e1e 100%
-            );
+        .editor::placeholder {
+            color: #8b949e;
         }
 
         .preview {
@@ -111,14 +108,14 @@
 
         .resizer {
             width: 4px;
-            background: #333;
+            background: #30363d;
             cursor: col-resize;
             position: relative;
             transition: background-color 0.2s;
         }
 
         .resizer:hover {
-            background: #555;
+            background: #484f58;
         }
 
         .resizer::after {
@@ -130,10 +127,10 @@
             bottom: 0;
         }
 
-        /* Markdown preview styles */
+        /* Markdown preview styles with improved contrast */
         .preview h1, .preview h2, .preview h3, .preview h4, .preview h5, .preview h6 {
             margin: 0 0 0.5em 0;
-            color: #fff;
+            color: #f0f6fc;
             font-weight: 600;
         }
 
@@ -144,13 +141,13 @@
 
         .preview h1 {
             font-size: 2em;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #30363d;
             padding-bottom: 0.3em;
         }
 
         .preview h2 {
             font-size: 1.5em;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #30363d;
             padding-bottom: 0.3em;
         }
 
@@ -160,11 +157,13 @@
 
         .preview p {
             margin: 1em 0;
+            color: #f0f6fc;
         }
 
         .preview ul, .preview ol {
             margin: 1em 0;
             padding-left: 2em;
+            color: #f0f6fc;
         }
 
         .preview li {
@@ -172,31 +171,36 @@
         }
 
         .preview code {
-            background: #2d2d2d;
+            background: #21262d;
+            color: #f85149;
             padding: 0.2em 0.4em;
             border-radius: 3px;
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
             font-size: 0.9em;
+            border: 1px solid #30363d;
         }
 
         .preview pre {
-            background: #2d2d2d;
+            background: #21262d;
             padding: 1em;
             border-radius: 5px;
             overflow-x: auto;
             margin: 1em 0;
+            border: 1px solid #30363d;
         }
 
         .preview pre code {
             background: none;
             padding: 0;
+            border: none;
+            color: #f0f6fc;
         }
 
         .preview blockquote {
-            border-left: 4px solid #444;
+            border-left: 4px solid #30363d;
             margin: 1em 0;
             padding-left: 1em;
-            color: #ccc;
+            color: #8b949e;
         }
 
         .preview table {
@@ -206,23 +210,25 @@
         }
 
         .preview th, .preview td {
-            border: 1px solid #444;
+            border: 1px solid #30363d;
             padding: 0.5em;
             text-align: left;
+            color: #f0f6fc;
         }
 
         .preview th {
-            background: #2d2d2d;
+            background: #21262d;
             font-weight: 600;
         }
 
         .preview a {
-            color: #4a9eff;
+            color: #58a6ff;
             text-decoration: none;
         }
 
         .preview a:hover {
             text-decoration: underline;
+            color: #79c0ff;
         }
 
         .preview img {
@@ -232,7 +238,7 @@
 
         .preview hr {
             border: none;
-            border-top: 1px solid #444;
+            border-top: 1px solid #30363d;
             margin: 2em 0;
         }
 
@@ -242,16 +248,16 @@
         }
 
         .editor::-webkit-scrollbar-track, .preview::-webkit-scrollbar-track {
-            background: #2d2d2d;
+            background: #21262d;
         }
 
         .editor::-webkit-scrollbar-thumb, .preview::-webkit-scrollbar-thumb {
-            background: #555;
+            background: #484f58;
             border-radius: 4px;
         }
 
         .editor::-webkit-scrollbar-thumb:hover, .preview::-webkit-scrollbar-thumb:hover {
-            background: #777;
+            background: #6e7681;
         }
     </style>
 </head>
@@ -416,46 +422,55 @@ Happy writing! 🚀</textarea>
                     const html = marked.parse(markdown);
                     this.preview.innerHTML = html;
                     
-                    // Enhanced syntax highlighting with error handling
-                    if (window.Prism && window.Prism.highlightElement) {
-                        // Highlight all code blocks
-                        this.preview.querySelectorAll('pre code').forEach((block) => {
-                            try {
-                                // Detect language from class or default to javascript
-                                let language = 'javascript';
-                                const classList = Array.from(block.classList);
-                                const langClass = classList.find(cls => cls.startsWith('language-'));
-                                
-                                if (langClass) {
-                                    language = langClass.replace('language-', '');
-                                } else {
-                                    // Try to detect from parent pre element
-                                    const parentClasses = Array.from(block.parentElement.classList);
-                                    const parentLangClass = parentClasses.find(cls => cls.startsWith('language-'));
-                                    if (parentLangClass) {
-                                        language = parentLangClass.replace('language-', '');
-                                        block.className = `language-${language}`;
-                                    } else {
-                                        block.className = `language-${language}`;
+                    // Enhanced syntax highlighting with better error handling
+                    if (window.Prism && window.Prism.highlightElement && window.Prism.languages) {
+                        // Wait for DOM to be ready
+                        requestAnimationFrame(() => {
+                            this.preview.querySelectorAll('pre code').forEach((block) => {
+                                try {
+                                    // Detect language from class or default to none
+                                    let language = 'none';
+                                    const classList = Array.from(block.classList);
+                                    const langClass = classList.find(cls => cls.startsWith('language-'));
+                                    
+                                    if (langClass) {
+                                        language = langClass.replace('language-', '');
+                                    } else if (block.parentElement) {
+                                        // Try to detect from parent pre element
+                                        const parentClasses = Array.from(block.parentElement.classList);
+                                        const parentLangClass = parentClasses.find(cls => cls.startsWith('language-'));
+                                        if (parentLangClass) {
+                                            language = parentLangClass.replace('language-', '');
+                                        }
                                     }
-                                }
-                                
-                                // Ensure the language is supported
-                                if (window.Prism.languages[language]) {
-                                    Prism.highlightElement(block);
-                                } else {
-                                    // Fallback to plain text
+                                    
+                                    // Ensure the language is supported and Prism is fully loaded
+                                    if (language !== 'none' && 
+                                        window.Prism.languages && 
+                                        window.Prism.languages[language] &&
+                                        typeof window.Prism.languages[language] === 'object') {
+                                        
+                                        // Clear existing classes and set the correct one
+                                        block.className = `language-${language}`;
+                                        
+                                        // Apply highlighting
+                                        Prism.highlightElement(block);
+                                    } else {
+                                        // Fallback to plain text styling
+                                        block.className = 'language-none';
+                                    }
+                                } catch (e) {
+                                    // Silent fallback - don't break the preview
+                                    console.warn('Syntax highlighting failed for code block:', e);
                                     block.className = 'language-none';
                                 }
-                            } catch (e) {
-                                // Silent fallback - don't break the preview
-                                console.warn('Syntax highlighting failed for code block:', e);
-                            }
+                            });
                         });
                     }
                 } catch (e) {
                     console.error('Preview update failed:', e);
                     // Don't break the editor if preview fails
+                    this.preview.innerHTML = '<p style="color: #f85149;">Preview error: ' + e.message + '</p>';
                 }
             }
             
@@ -526,16 +541,30 @@ Happy writing! 🚀</textarea>
             }
         }
         
-        // Initialize the editor when the page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            try {
-                new MarkdownEditor();
-            } catch (e) {
-                console.error('Failed to initialize Markdown Editor:', e);
+        // Wait for all scripts to load before initializing
+        function initializeWhenReady() {
+            if (typeof marked !== 'undefined' && 
+                window.Prism && 
+                window.Prism.highlightElement) {
+                try {
+                    new MarkdownEditor();
+                } catch (e) {
+                    console.error('Failed to initialize Markdown Editor:', e);
+                }
+            } else {
+                // Wait a bit more for scripts to load
+                setTimeout(initializeWhenReady, 100);
             }
-        });
+        }
         
-        // Handle any unhandled errors
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeWhenReady);
+        } else {
+            initializeWhenReady();
+        }
+        
+        // Handle any unhandled errors gracefully
         window.addEventListener('error', (e) => {
             console.error('Unhandled error:', e.error);
             return true; // Prevent default error handling
